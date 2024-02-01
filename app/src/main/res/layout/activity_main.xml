@@ -21,6 +21,7 @@ tools:context=".MyActivity">
             android:gravity="center"
             android:layout_gravity="center_vertical|center_horizontal"
             />
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
