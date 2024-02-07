@@ -10,9 +10,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://maven.zohodl.com")
     }
 }
 
 rootProject.name = "ZohoHostApplication"
 include(":app")
- 
+include(":velocity_zoho")
