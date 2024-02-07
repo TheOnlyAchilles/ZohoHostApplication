@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         myButton.setOnClickListener {
             Toast.makeText(
                 applicationContext,
-                velocityZohoChat.getHelloWorld(),
+                velocityZohoChat.helloWorld,
                 Toast.LENGTH_SHORT
             ).show()
         }

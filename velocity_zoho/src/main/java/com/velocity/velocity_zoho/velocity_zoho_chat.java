@@ -10,9 +10,7 @@ import com.zoho.commons.Fonts;
 
 public class velocity_zoho_chat extends Application {
     public String message = "Hello, world! MotherF*****";
-    private Application application;
-    private String appKey = "0YTMmRaFQkdKEEb6NxhloyN7WcoYThP9naVmXju0PF%2FC1sCwmNlvVw%3D%3D_eu";
-    private String accessKey = "LbO1ugc6oWJuhb2lMBuvgCbX8ePG4Vah1oUY2SbehdSV7ijMF6zKKqyBa90tFrc8eLCb6%2F6tylPKHmQ9qwrgNYjBx4SjLDClQ2kmhRKuTsxF5taRliRJYyGz2avGobCKBASPR7MbSJT3JJSvtk9%2B6RPCANC9LnQa";
+    private final Application application;
 
     public velocity_zoho_chat(Application application) {
         this.application = application;
@@ -27,6 +25,8 @@ public class velocity_zoho_chat extends Application {
             InitConfig initConfig = new InitConfig();
             initConfig.setFont(Fonts.REGULAR, ""); // Specify your font here
 
+            String accessKey = "LbO1ugc6oWJuhb2lMBuvgCbX8ePG4Vah1oUY2SbehdSV7ijMF6zKKqyBa90tFrc8eLCb6%2F6tylPKHmQ9qwrgNYjBx4SjLDClQ2kmhRKuTsxF5taRliRJYyGz2avGobCKBASPR7MbSJT3JJSvtk9%2B6RPCANC9LnQa";
+            String appKey = "0YTMmRaFQkdKEEb6NxhloyN7WcoYThP9naVmXju0PF%2FC1sCwmNlvVw%3D%3D_eu";
             ZohoSalesIQ.init(application, appKey, accessKey, initConfig, new InitListener() {
                 @Override
                 public void onInitSuccess() {
