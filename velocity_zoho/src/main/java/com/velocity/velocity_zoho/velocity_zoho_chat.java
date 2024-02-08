@@ -5,6 +5,7 @@ import android.util.Log;
 import com.zoho.commons.InitConfig;
 import com.zoho.livechat.android.listeners.InitListener;
 import com.zoho.salesiqembed.ZohoSalesIQ;
+import org.json.JSONArray;
 
 public class velocity_zoho_chat extends Application {
 
@@ -29,4 +30,20 @@ public class velocity_zoho_chat extends Application {
         }
     }
 
+    public void loadDepartments() {
+        DepartmentExecutor departmentExecutor = new DepartmentExecutor();
+        departmentExecutor.loadDepartments(new DepartmentExecutor.DepartmentCallback() {
+            @Override
+            public void onDepartmentsLoaded(JSONArray departments) {
+                // Handle the loaded departments (update UI, etc.)
+                Log.d("LOGS", "Received departments: " + departments.toString());
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                // Handle the error (show error message, etc.)
+                Log.e("LOGS", "Error fetching departments: " + error.getMessage());
+            }
+        });
+    }
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.velocity.velocity_zoho.velocity_zoho_chat
 
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -12,5 +13,7 @@ class MainActivity : AppCompatActivity() {
         val appKey = "{{appKey}}"
         val accessKey = "{{accessKey}}"
         velocity_zoho_chat().initZoho(application, appKey, accessKey)
+        velocity_zoho_chat().loadDepartments()
+
     }
 }
