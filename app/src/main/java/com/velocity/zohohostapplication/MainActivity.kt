@@ -9,8 +9,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val appKey = "{{appKey}}";
-        val accessKey = "{{accessKey}}";
-        velocity_zoho_chat().initZoho(application, appKey, accessKey);
+        val appKey = "{{appKey}}"
+        val accessKey = "{{accessKey}}"
+        velocity_zoho_chat().initZoho(application, appKey, accessKey)
     }
 }
