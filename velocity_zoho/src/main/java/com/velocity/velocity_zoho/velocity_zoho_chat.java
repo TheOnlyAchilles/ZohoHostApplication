@@ -3,6 +3,7 @@ package com.velocity.velocity_zoho;
 import android.app.Application;
 import android.util.Log;
 import com.zoho.commons.InitConfig;
+import com.zoho.livechat.android.ZohoLiveChat;
 import com.zoho.livechat.android.listeners.InitListener;
 import com.zoho.salesiqembed.ZohoSalesIQ;
 import org.json.JSONArray;
@@ -17,13 +18,10 @@ public class velocity_zoho_chat extends Application {
 
     public velocity_zoho_chat(){
     }
-    public velocity_zoho_chat(String appKey, String accessKey, String languageCode, String countryCode, Application application, Boolean testMode){
+    public velocity_zoho_chat(String appKey, String accessKey, Application application){
         this.appKey = appKey;
         this.accessKey = accessKey;
-        this.languageCode = languageCode;
-        this.countryCode = countryCode;
         this.application = application;
-        this.testMode = testMode;
         this.initZoho();
     }
 
@@ -34,7 +32,6 @@ public class velocity_zoho_chat extends Application {
                 @Override
                 public void onInitSuccess() {
                     Log.d("LOGS", "SUCCESS");
-                    ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.ALWAYS);
                 }
 
                 @Override
@@ -63,5 +60,9 @@ public class velocity_zoho_chat extends Application {
                 Log.e("LOGS", "Error fetching departments: " + error.getMessage());
             }
         });
+    }
+
+    public void openChat() {
+        ZohoSalesIQ.Chat.show();
     }
 }

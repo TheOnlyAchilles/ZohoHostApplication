@@ -12,5 +12,12 @@ tools:context=".MainActivity">
         tools:ignore="MissingConstraints">
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/myButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chat"
+        tools:ignore="MissingConstraints" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
