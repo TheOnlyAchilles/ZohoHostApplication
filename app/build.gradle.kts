@@ -1,8 +1,13 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
 
+val localProperties = Properties().apply { rootProject.file("local.properties").reader().use {load(it)} }
+val appKey: String? = localProperties.getProperty("APP_KEY")
+val accessKey: String? = localProperties.getProperty("ACCESS_KEY")
 android {
     namespace = "com.velocity.zohohostapplication"
     compileSdk = 34
@@ -15,6 +20,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "APP_KEY", "\"${appKey}\"")
+        buildConfigField("String", "ACCESS_KEY", "\"${accessKey}\"")
     }
 
     buildTypes {
@@ -26,6 +33,11 @@ android {
             )
         }
     }
+
+    buildFeatures{
+        buildConfig = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

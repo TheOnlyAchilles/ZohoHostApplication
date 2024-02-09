@@ -8,8 +8,26 @@ import com.zoho.salesiqembed.ZohoSalesIQ;
 import org.json.JSONArray;
 
 public class velocity_zoho_chat extends Application {
+    private String appKey;
+    private String accessKey;
+    private String languageCode;
+    private String countryCode;
+    private Application application;
+    private Boolean testMode;
 
-    public void initZoho(Application application, String appKey, String accessKey){
+    public velocity_zoho_chat(){
+    }
+    public velocity_zoho_chat(String appKey, String accessKey, String languageCode, String countryCode, Application application, Boolean testMode){
+        this.appKey = appKey;
+        this.accessKey = accessKey;
+        this.languageCode = languageCode;
+        this.countryCode = countryCode;
+        this.application = application;
+        this.testMode = testMode;
+        this.initZoho();
+    }
+
+    public void initZoho(){
         try {
             InitConfig initConfig = new InitConfig();
             ZohoSalesIQ.init(application, appKey, accessKey, initConfig, new InitListener() {
