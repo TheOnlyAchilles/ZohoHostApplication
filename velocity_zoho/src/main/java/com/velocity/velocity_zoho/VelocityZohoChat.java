@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+
 import com.zoho.commons.InitConfig;
 import com.zoho.livechat.android.VisitorChat;
 import com.zoho.livechat.android.ZohoLiveChat;
@@ -11,22 +14,25 @@ import com.zoho.livechat.android.constants.ConversationType;
 import com.zoho.livechat.android.listeners.ConversationListener;
 import com.zoho.livechat.android.listeners.InitListener;
 import com.zoho.salesiqembed.ZohoSalesIQ;
+
 import org.json.JSONArray;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class velocity_zoho_chat extends Application {
+public class VelocityZohoChat extends Application {
     private String appKey;
     private String accessKey;
     private Application application;
 
-    public velocity_zoho_chat() {
+    public VelocityZohoChat() {
     }
 
-    public velocity_zoho_chat(String appKey, String accessKey, Application application) {
+    public VelocityZohoChat(String appKey, String accessKey, Application application) {
         this.appKey = appKey;
         this.accessKey = accessKey;
         this.application = application;
@@ -40,8 +46,8 @@ public class velocity_zoho_chat extends Application {
                 @Override
                 public void onInitSuccess() {
                     Log.i("LOGS", "SUCCESS");
-                    showZohoLauncher();
                 }
+
                 @Override
                 public void onInitError(int errorCode, String errorMessage) {
                     Log.e("LOGS", "ERROR: " + errorMessage);
@@ -52,28 +58,40 @@ public class velocity_zoho_chat extends Application {
         }
     }
 
-    public void setDepartment(String countryCode) {
+    public void setDepartment(String countryCode, boolean testMode, String environment) {
         DepartmentExecutor departmentExecutor = new DepartmentExecutor();
         departmentExecutor.loadDepartments(new DepartmentExecutor.DepartmentCallback() {
             @Override
             public void onDepartmentsLoaded(JSONArray departmentJSON) {
-                // Handle the loaded departments (update UI, etc.)
                 String departmentName = "";
                 List<Department> departments = Department.loadDepartmentFromRaw(departmentJSON);
-                for (Department department : departments) {
-                    for (String code : department.getCodes()) {
-                        if (code.equalsIgnoreCase(countryCode)) {
-                            departmentName = department.getName();
-                            break;
+                if (!environment.equalsIgnoreCase("staging")) {
+                    if (!testMode) {
+                        for (Department department : departments) {
+                            boolean isMatched = false;
+                            for (String code : department.getCodes()) {
+
+                                if (code.equalsIgnoreCase(countryCode)) {
+                                    departmentName = department.getName();
+                                    ZohoSalesIQ.Chat.setDepartment(departmentName);
+                                    isMatched = true;
+                                    break;
+                                }
+                            }
+                            if (!isMatched && department.getDefaults()) {
+                                departmentName = department.getName();
+                                ZohoSalesIQ.Chat.setDepartment(departmentName);
+                                break;
+                            }
+                            if (!departmentName.isEmpty()) {
+                                break;
+                            }
                         }
-                    }
-                    if (!departmentName.isEmpty()) {
-                        break;
                     }
                 }
                 Log.d("LOGS", "onDepartmentsLoaded: " + departmentName);
-                ZohoSalesIQ.Chat.setDepartment(departmentName);
             }
+
             @Override
             public void onError(Throwable error) {
                 // Handle the error (show error message, etc.)
@@ -82,17 +100,16 @@ public class velocity_zoho_chat extends Application {
         });
     }
 
-    public void startChat(Map<String, String> additionalInformation, String title, Activity activity) {
-        setAdditionalInformation(additionalInformation);
+    public void startChat(String companyName, @Nullable String serviceName, String title, Activity activity) {
+        setAdditionalInformation(companyName, serviceName);
         setTitle(title);
         open(activity);
     }
 
-    public void openChat(String countryCode, String languageCode, Context context) {
+    public void openChat(String languageCode, String countryCode, boolean testMode, String environment, Context context) {
         ZohoLiveChat.Visitor.setQuestion(questionText(languageCode, context));
-        setDepartment(countryCode);
+        setDepartment(countryCode, testMode, environment);
         setLanguage(languageCode);
-        showZohoLauncher();
         ZohoSalesIQ.Chat.show();
         Log.d("LOGS", "Chat Shown");
     }
@@ -143,12 +160,25 @@ public class velocity_zoho_chat extends Application {
         ZohoSalesIQ.Chat.setTitle(title);
     }
 
-    public static void setAdditionalInformation(Map<String, String> additionalInformation) {
-        for (Map.Entry<String, String> entry : additionalInformation.entrySet()) {
+    public static void setAdditionalInformation(String companyName, @Nullable String serviceName) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("Company Name", companyName);
+
+        if (serviceName != null) {
+            result.put("Page", "Services");
+            result.put("Primary Need", serviceName);
+            result.put("Potential Risk", "No");
+        } else {
+            result.put("Page", "Support");
+            result.put("Primary Need", "None");
+            result.put("Potential Risk", "Yes");
+        }
+
+        for (Map.Entry<String, Object> entry : result.entrySet()) {
             String currentDynamicKey = entry.getKey();
-            String currentDynamicValue = entry.getValue();
-            Log.d("LOGS", "Setting " + currentDynamicKey + " to " + currentDynamicValue);
-            ZohoSalesIQ.Visitor.addInfo(currentDynamicKey, currentDynamicValue);
+            Object currentDynamicValue = entry.getValue();
+            Log.d("LOGS", "KEY: " + currentDynamicKey + "VALUE: " + currentDynamicValue);
+            ZohoSalesIQ.Visitor.addInfo(currentDynamicKey, currentDynamicValue.toString());
         }
     }
 
@@ -158,33 +188,30 @@ public class velocity_zoho_chat extends Application {
                 new ConversationListener() {
                     @Override
                     public void onSuccess(ArrayList<VisitorChat> chats) {
-                        if (removeWaitingMissed(chats).size() > 0){
+                        if (removeWaitingMissed(chats).size() > 0) {
                             ZohoSalesIQ.Chat.open(activity);
                             Log.d("LOGS", "Chats Opened");
-                        }
-                        else
-                        {
+                        } else {
                             ZohoSalesIQ.Chat.open(activity);
                             Log.d("LOGS", "Chat Opened");
                         }
                     }
+
                     @Override
                     public void onFailure(int code, String message) {
                         //your code
-                        Log.d("LOGS", "onFailure: " + code + " : "+ message);
+                        Log.d("LOGS", "onFailure: " + code + " : " + message);
                     }
                 }
         );
     }
 
-    private ArrayList<VisitorChat> removeWaitingMissed(ArrayList<VisitorChat> chats)
-    {
+    private ArrayList<VisitorChat> removeWaitingMissed(ArrayList<VisitorChat> chats) {
         ListIterator<VisitorChat> data = chats.listIterator();
-        ArrayList<VisitorChat> filteredChats = new ArrayList<VisitorChat>();
-        while(data.hasNext()) {
+        ArrayList<VisitorChat> filteredChats = new ArrayList<>();
+        while (data.hasNext()) {
             VisitorChat currentChat = data.next();
-            if (currentChat.getAttenderId() != null && currentChat.getAttenderId().compareTo("") == 0 && currentChat.getChatStatus().compareTo("WAITING") == 0)
-            {
+            if (currentChat.getAttenderId() != null && currentChat.getAttenderId().compareTo("") == 0 && currentChat.getChatStatus().compareTo("WAITING") == 0) {
                 continue;
             }
             filteredChats.add(currentChat);
@@ -204,19 +231,23 @@ public class velocity_zoho_chat extends Application {
                     @Override
                     public void onFailure(int code, String message) {
                         //your code
-                        Log.d("LOGS", "onFailure: " + code + " : "+ message);
+                        Log.d("LOGS", "onFailure: " + code + " : " + message);
                     }
                 }
         );
     }
 
-    private void showZohoLauncher() {
+    public void showZohoLauncher() {
         ZohoSalesIQ.Chat.getList(
                 ConversationType.OPEN,
                 new ConversationListener() {
                     @Override
                     public void onSuccess(ArrayList<VisitorChat> chats) {
-                        ZohoSalesIQ.showLauncher(removeWaitingMissed(chats).size() > 0);
+                        if (removeWaitingMissed(chats).size() > 0) {
+                            ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.ALWAYS);
+                        } else {
+                            ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.NEVER);
+                        }
                         if (chats.size() > 0) {
                             checkAndEndChat(chats.get(0).getLastMessage().getTime());
                         }
@@ -239,7 +270,7 @@ public class velocity_zoho_chat extends Application {
         }
     }
 
-    private void endSession()  {
+    private void endSession() {
         endChat();
         ZohoSalesIQ.Launcher.show(ZohoSalesIQ.Launcher.VisibilityMode.WHEN_ACTIVE_CHAT);
         ZohoSalesIQ.clearData(application);

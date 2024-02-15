@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.velocity.velocity_zoho.velocity_zoho_chat
-import java.util.Map
-
+import com.velocity.velocity_zoho.VelocityZohoChat
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,21 +16,25 @@ class MainActivity : AppCompatActivity() {
         val accessKey = BuildConfig.ACCESS_KEY
         val languageCode = "nl"
         val countryCode = "nl"
-        val testMode = false
+        val testMode = true
+        val environment = "staging"
         val title = "ICAS Hub"
-        val additionalInfo = Map.of(
-            "Company Name", "Acme Corp",
-            "Page", "Services",
-            "Primary Need", "Customer Support",
-            "Potential Risk", "No"
+        val companyCode = "Meyer&Muller"
+        val serviceName = null
+
+
+        VelocityZohoChat(
+            appKey,
+            accessKey,
+            application
         )
-
-
-        velocity_zoho_chat(appKey, accessKey, application)
+        VelocityZohoChat().showZohoLauncher()
         myButton.setOnClickListener {
             Toast.makeText(this, "Button clicked!", Toast.LENGTH_SHORT).show()
-            velocity_zoho_chat().startChat(additionalInfo, title, this)
-            velocity_zoho_chat().openChat(countryCode, languageCode, applicationContext)
+            VelocityZohoChat()
+                .startChat(companyCode, serviceName, title, this)
+            VelocityZohoChat()
+                .openChat(languageCode, countryCode, testMode, environment, applicationContext)
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.velocity.velocity_zoho;
 
 import android.content.Context;
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.InputStream;
@@ -40,16 +38,18 @@ public class Translation {
             InputStream inputStream = context.getResources().openRawResource(resourceId);
             int size = inputStream.available();
             byte[] buffer = new byte[size];
-            inputStream.read(buffer);
+            int byteRead = inputStream.read(buffer);
             inputStream.close();
-            String json = new String(buffer, StandardCharsets.UTF_8);
-            JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                Translation translation = new Translation();
-                translation.setText(jsonObject.getString("text"));
-                translation.setTo(jsonObject.getString("to"));
-                translations.add(translation);
+            if (byteRead > 0) {
+                String json = new String(buffer, StandardCharsets.UTF_8);
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Translation translation = new Translation();
+                    translation.setText(jsonObject.getString("text"));
+                    translation.setTo(jsonObject.getString("to"));
+                    translations.add(translation);
+                }
             }
         } catch (Exception e) {
             // Handle the exception

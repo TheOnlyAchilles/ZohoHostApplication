@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ZohoHostApplication"
         tools:targetApi="31"
-        android:name="com.velocity.velocity_zoho.velocity_zoho_chat"
+        android:name="com.velocity.velocity_zoho.VelocityZohoChat"
         >
         <activity
             android:name=".MainActivity"
